@@ -3,7 +3,7 @@ const { resolve } = require('path');
 
 const contactsPath = resolve('./models/contacts.json');
 
-const getContacts = async (req, res) => {
+const getContacts = async (_, res) => {
   try {
     const data = await fs.readFile(contactsPath, 'utf-8');
     const contacts = JSON.parse(data);
@@ -69,12 +69,7 @@ const removeContact = async (req, res) => {
 
 const updateContact = async (req, res) => {
   const contactId = req.params.contactId;
-  console.log(
-    '🚀 ~ file: contacts.js:72 ~ updateContact ~ contactId:',
-    contactId,
-  );
   const body = req.body;
-  console.log('🚀 ~ file: contacts.js:74 ~ updateContact ~ body:', body);
 
   try {
     if (!body) {
