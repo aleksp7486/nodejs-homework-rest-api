@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 const addContactValidation = (req, res, next) => {
   const schema = Joi.object({
-    name: Joi.string().alphanum().min(3).max(30),
+    name: Joi.string().min(3).max(30).required(),
     email: Joi.string().email().required(),
     phone: Joi.string()
       .length(10)
@@ -23,7 +23,7 @@ const addContactValidation = (req, res, next) => {
 
 const updateContactValidation = (req, res, next) => {
   const schema = Joi.object({
-    name: Joi.string().alphanum().min(3).max(30),
+    name: Joi.string().min(3).max(30),
     email: Joi.string().email(),
     phone: Joi.string()
       .length(10)
