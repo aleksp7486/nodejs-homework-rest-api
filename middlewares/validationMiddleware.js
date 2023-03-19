@@ -1,6 +1,8 @@
 const Joi = require('joi');
 
-const addContactValidation = (req, res, next) => {
+const { ValidationError } = require('../helpers/error');
+
+const addContactValidation = (req, _, next) => {
   const schema = Joi.object({
     name: Joi.string().min(3).max(30).required(),
     email: Joi.string().email().required(),
@@ -12,16 +14,13 @@ const addContactValidation = (req, res, next) => {
 
   const validationResult = schema.validate(req.body);
   if (validationResult.error) {
-    next({
-      status: 400,
-      message: validationResult.error.details,
-    });
+    next(new ValidationError(JSON.stringify(validationResult.error.details)));
   }
 
   next();
 };
 
-const updateContactValidation = (req, res, next) => {
+const updateContactValidation = (req, _, next) => {
   const schema = Joi.object({
     name: Joi.string().min(3).max(30),
     email: Joi.string().email(),
@@ -32,13 +31,48 @@ const updateContactValidation = (req, res, next) => {
 
   const validationResult = schema.validate(req.body);
   if (validationResult.error) {
-    next({
-      status: 400,
-      message: validationResult.error.details,
-    });
+    next(
+      next(new ValidationError(JSON.stringify(validationResult.error.details))),
+    );
   }
 
   next();
 };
 
-module.exports = { addContactValidation, updateContactValidation };
+const userValidation = (req, _, next) => {
+  const schema = Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+  });
+
+  const validationResult = schema.validate(req.body);
+  if (validationResult.error) {
+    next(
+      next(new ValidationError(JSON.stringify(validationResult.error.details))),
+    );
+  }
+
+  next();
+};
+
+const subscriptionValidation = (req, _, next) => {
+  const schema = Joi.object({
+    subscription: Joi.string().valid('starter', 'pro', 'business'),
+  });
+
+  const validationResult = schema.validate(req.body);
+  if (validationResult.error) {
+    next(
+      next(new ValidationError(JSON.stringify(validationResult.error.details))),
+    );
+  }
+
+  next();
+};
+
+module.exports = {
+  addContactValidation,
+  updateContactValidation,
+  userValidation,
+  subscriptionValidation,
+};

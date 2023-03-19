@@ -1,131 +1,101 @@
-const service = require('../service/index');
+const service = require('../services/contactService');
 
-const getContactsController = async (_, res, next) => {
-  try {
-    const contacts = await service.getAllContacts();
-    if (!contacts) {
-      return res.status(404).json({ message: 'Not found' });
-    }
-    return res.status(200).json(contacts);
-  } catch (e) {
-    console.error(e.message);
-    next(e);
+const getContactsController = async (req, res) => {
+  const { _id: owner } = req.user;
+  let { page = 1, limit = 20, favorite = false } = req.query;
+  limit = parseInt(limit) > 20 ? 20 : parseInt(limit);
+  page = parseInt(page);
+
+  const contacts = await service.getAllContacts(owner, {
+    page,
+    limit,
+    favorite,
+  });
+
+  if (contacts) {
+    return res.status(200).json({ data: { contacts }, page, limit });
+  } else {
+    return res.status(404).json({ message: 'Not found' });
   }
 };
 
-const getContactByIdController = async (req, res, next) => {
+const getContactByIdController = async (req, res) => {
   const contactId = req.params.contactId;
-  try {
-    const result = await service.getContactById(contactId);
+  console.log(req.user);
+  const { _id: owner } = req.user;
 
-    if (result) {
-      return res.status(200).json(result);
-    } else {
-      return res.status(404).json({
-        message: `Failure, no contacts with id '${contactId}' found!`,
-      });
-    }
-  } catch (e) {
-    console.error(e.message);
-    next(e);
+  const result = await service.getContactById(contactId, owner);
+
+  if (result) {
+    return res.status(200).json({ data: { contact: result } });
+  } else {
+    return res.status(404).json({
+      message: `Failure, no contacts with id '${contactId}' found!`,
+    });
   }
 };
 
-const addContactController = async (req, res, next) => {
-  const fields = req.body;
-  try {
-    const result = await service.createContact(fields);
-    res.status(201).json({
-      status: 'success',
-      code: 201,
+const addContactController = async (req, res) => {
+  const contact = req.body;
+  const { _id: owner } = req.user;
+  const result = await service.createContact(contact, owner);
+  res.status(201).json({
+    data: { contact: result },
+  });
+};
+
+const updateContactController = async (req, res) => {
+  const contactId = req.params.contactId;
+  const body = req.body;
+  const { _id: owner } = req.user;
+
+  const result = await service.updateContact(contactId, body, owner);
+  if (result) {
+    res.status(200).json({
       data: { contact: result },
     });
-  } catch (e) {
-    console.error(e);
-    next(e);
+  } else {
+    res.status(404).json({
+      message: `Not found contact id: ${contactId}`,
+    });
   }
 };
 
-const updateContactController = async (req, res, next) => {
+const removeContactController = async (req, res) => {
   const contactId = req.params.contactId;
-  const fields = req.body;
+  const { _id: owner } = req.user;
 
-  try {
-    const result = await service.updateContact(contactId, fields);
-    if (result) {
-      res.json({
-        status: 'success',
-        code: 200,
-        data: { contact: result },
-      });
-    } else {
-      res.status(404).json({
-        status: 'error',
-        code: 404,
-        message: `Not found task id: ${contactId}`,
-        data: 'Not Found',
-      });
-    }
-  } catch (e) {
-    console.error(e.message);
-    next(e);
-  }
-};
-
-const removeContactController = async (req, res, next) => {
-  const contactId = req.params.contactId;
-  try {
-    const result = await service.removeContact(contactId);
-    if (result) {
-      res.json({
-        status: 'success',
-        code: 200,
-        data: { contact: result },
-      });
-    } else {
-      res.status(404).json({
-        status: 'error',
-        code: 404,
-        message: `Not found task id: ${contactId}`,
-        data: 'Not Found',
-      });
-    }
-  } catch (e) {
-    console.error(e.message);
-    next(e);
+  const result = await service.removeContact(contactId, owner);
+  if (result) {
+    res.status(200).json({
+      data: { contact: result },
+    });
+  } else {
+    res.status(404).json({
+      message: `Not found contact id: ${contactId}`,
+    });
   }
 };
 
 const updateStatusController = async (req, res, next) => {
   const contactId = req.params.contactId;
   const body = req.body;
-  console.log('🚀 ~ file: index.js:102 ~ updateStatus ~ body:', body);
+  const { _id: owner } = req.user;
+
   if (Object.keys(body).length === 0) {
-    res.json({
-      status: 'error',
-      code: 400,
+    res.status(400).json({
       message: 'missing field favorite',
     });
   } else {
-    try {
-      const result = await service.updateStatusContact(contactId, body);
-      if (result) {
-        res.json({
-          status: 'success',
-          code: 200,
-          data: { contact: result },
-        });
-      } else {
-        res.status(404).json({
-          status: 'error',
-          code: 404,
-          message: `Not found task id: ${contactId}`,
-          data: 'Not Found',
-        });
-      }
-    } catch (e) {
-      console.error(e.message);
-      next(e);
+    const result = await service.updateStatusContact(contactId, body, owner);
+    if (result) {
+      res.status(200).json({
+        data: { contact: result },
+      });
+    } else {
+      res.status(404).json({
+        message: `Not found contact id: ${contactId}`,
+      });
     }
   }
 };

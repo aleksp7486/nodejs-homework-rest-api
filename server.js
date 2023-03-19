@@ -1,51 +1,42 @@
 const express = require('express');
 const logger = require('morgan');
 const cors = require('cors');
-require('dotenv').config();
-const mongoose = require('mongoose');
 
 const app = express();
-const contactsRouter = require('./routes/api/contacts');
+const contactsRouter = require('./routes/contactsRouter');
+const userRouter = require('./routes/userRouter');
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
+const { errorHandler } = require('./helpers/apiHelpers');
+
+const { connectMongo } = require('./db/connectMongo');
+const PORT = process.env.PORT || 3000;
 
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
-app.use('/api/contacts', contactsRouter);
+app.use('/contacts', contactsRouter);
+app.use('/user', userRouter);
 app.use((_, res, __) => {
   res.status(404).json({
     status: 'error',
     code: 404,
-    message: 'Use api on routes: /api/contacts',
+    message: 'Use api on routes: /contacts',
     data: 'Not found',
   });
 });
+app.use(errorHandler);
 
-app.use((err, _, res, __) => {
-  console.log(err.stack);
-  res.status(500).json({
-    status: 'fail',
-    code: 500,
-    message: err.message,
-    data: 'Internal Server Error',
-  });
-});
-
-const PORT = process.env.PORT || 3000;
-const uriDb = process.env.DB_HOST;
-
-mongoose.Promise = global.Promise;
-
-const connection = mongoose.connect(uriDb);
-
-connection
-  .then(() => {
+const start = async () => {
+  try {
+    await connectMongo();
     console.log('Database connection successful');
-    app.listen(PORT, () => {
-      console.log(`Server running. Use our API on port: ${PORT}`);
+    app.listen(PORT, err => {
+      if (err) console.error('Error at server launch:', err);
+      console.log(`Server works at port ${PORT}!`);
     });
-  })
-  .catch(err => {
-    console.log(`Server not running. Error message: ${err.message}`);
-    process.exit(1);
-  });
+  } catch (err) {
+    console.error(`Failed to launch application with error: ${err.message}`);
+  }
+};
+
+start();
