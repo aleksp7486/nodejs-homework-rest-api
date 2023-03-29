@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const { RegistrationError, NotAuthorizedError } = require('../helpers/error');
+const gravatar = require('gravatar');
 
 const registerUser = async ({ email, password }) => {
   const user = await User.findOne({ email });
@@ -11,7 +12,14 @@ const registerUser = async ({ email, password }) => {
     throw new RegistrationError('Email in use');
   }
 
-  return User.create({ email, password });
+  const avatarURL = gravatar.url(email, {
+    protocol: 'http',
+    s: '200',
+    r: 'pg',
+    d: 'mp',
+  });
+
+  return User.create({ email, password, avatarURL });
 };
 
 const loginUser = async ({ email, password }) => {

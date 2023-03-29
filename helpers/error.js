@@ -19,6 +19,13 @@ class NotAuthorizedError extends PhoneBookError {
   }
 }
 
+class IdError extends PhoneBookError {
+  constructor(message) {
+    super(message);
+    this.status = 401;
+  }
+}
+
 class RegistrationError extends PhoneBookError {
   constructor(message) {
     super(message);
@@ -30,5 +37,6 @@ module.exports = {
   PhoneBookError,
   ValidationError,
   NotAuthorizedError,
+  IdError,
   RegistrationError,
 };

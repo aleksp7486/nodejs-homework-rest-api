@@ -36,10 +36,10 @@ const logoutUserController = async (req, res) => {
 const currentUserController = async (req, res) => {
   const { _id: id } = req.user;
   const { email, subscription } = await service.currentUser(id);
-  res.status(200).json({ email, subscription });
+  res.status(200).json({ user: { email, subscription } });
 };
 
-const userSubscriptionController = async (req, res) => {
+const subscriptionUserController = async (req, res) => {
   const body = req.body;
   const { _id: id } = req.user;
   const { email, subscription } = await service.subscriptionUser(body, id);
@@ -56,5 +56,5 @@ module.exports = {
   loginUserController,
   logoutUserController,
   currentUserController,
-  userSubscriptionController,
+  subscriptionUserController,
 };

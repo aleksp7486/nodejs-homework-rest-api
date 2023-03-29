@@ -1,5 +1,4 @@
 const express = require('express');
-
 const router = express.Router();
 
 const { asyncWrapper } = require('../helpers/apiHelpers');
@@ -9,7 +8,7 @@ const {
   loginUserController,
   logoutUserController,
   currentUserController,
-  userSubscriptionController,
+  subscriptionUserController,
 } = require('../controllers/userController.js');
 
 const authMiddleware = require('../middlewares/authMiddleware');
@@ -31,7 +30,7 @@ router.patch(
   '/',
   subscriptionValidation,
   authMiddleware,
-  asyncWrapper(userSubscriptionController),
+  asyncWrapper(subscriptionUserController),
 );
 
 module.exports = router;

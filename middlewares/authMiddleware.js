@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 const { NotAuthorizedError } = require('../helpers/error');
 const User = require('../db/userModel');
 
