@@ -2,7 +2,11 @@ const Contact = require('../db/contactModel');
 const { ObjectId } = require('mongodb');
 const { IdError } = require('../helpers/error');
 
-// todo: Сделать обертку, вместо повторяющегося кода
+const handleError = id => {
+  if (!ObjectId.isValid(id)) {
+    throw new IdError('Wrong id');
+  }
+};
 
 const getAllContacts = async (owner, { page, limit, favorite }) => {
   const skip = limit * (page - 1);
@@ -14,14 +18,11 @@ const getAllContacts = async (owner, { page, limit, favorite }) => {
 };
 
 const getContactById = async (id, owner) => {
-  if (ObjectId.isValid(id)) {
-    return Contact.findOne({
-      _id: new ObjectId(id),
-      owner,
-    });
-  } else {
-    throw new IdError('Wrong id');
-  }
+  handleError(id);
+  return Contact.findOne({
+    _id: new ObjectId(id),
+    owner,
+  });
 };
 
 const createContact = ({ name, email, phone }, owner) => {
@@ -29,31 +30,22 @@ const createContact = ({ name, email, phone }, owner) => {
 };
 
 const updateContact = (id, fields, owner) => {
-  if (ObjectId.isValid(id)) {
-    return Contact.findByIdAndUpdate({ _id: new ObjectId(id), owner }, fields, {
-      new: true,
-    });
-  } else {
-    throw new IdError('Wrong id');
-  }
+  handleError(id);
+  return Contact.findByIdAndUpdate({ _id: new ObjectId(id), owner }, fields, {
+    new: true,
+  });
 };
 
 const removeContact = (id, owner) => {
-  if (ObjectId.isValid(id)) {
-    return Contact.findOneAndRemove({ _id: new ObjectId(id), owner });
-  } else {
-    throw new IdError('Wrong id');
-  }
+  handleError(id);
+  return Contact.findOneAndRemove({ _id: new ObjectId(id), owner });
 };
 
 const updateStatusContact = (id, body, owner) => {
-  if (ObjectId.isValid(id)) {
-    return Contact.findOneAndUpdate({ _id: new ObjectId(id), owner }, body, {
-      new: true,
-    });
-  } else {
-    throw new IdError('Wrong id');
-  }
+  handleError(id);
+  return Contact.findOneAndUpdate({ _id: new ObjectId(id), owner }, body, {
+    new: true,
+  });
 };
 
 module.exports = {

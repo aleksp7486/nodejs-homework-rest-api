@@ -1,10 +1,10 @@
 const Jimp = require('jimp');
 const path = require('path');
-const service = require('../services/filesService');
+const service = require('../services/avatarService');
 
 const AVATAR_DIR = path.resolve('./public/avatars');
 
-const uploadController = async (req, res) => {
+const avatarUploadController = async (req, res) => {
   const { _id: id } = req.user;
   const { path } = req.file;
   const [, extension] = req.file.originalname.split('.');
@@ -34,5 +34,5 @@ const uploadController = async (req, res) => {
 };
 
 module.exports = {
-  uploadController,
+  avatarUploadController,
 };

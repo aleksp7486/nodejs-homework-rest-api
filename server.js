@@ -7,7 +7,7 @@ const app = express();
 
 const contactsRouter = require('./routes/contactsRouter');
 const userRouter = require('./routes/userRouter');
-const filesRouter = require('./routes/filesRouter');
+const filesRouter = require('./routes/avatarRouter');
 
 const formatsLogger = app.get('env') === 'development' ? 'dev' : 'short';
 const { errorHandler } = require('./helpers/apiHelpers');
@@ -20,7 +20,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/contacts', contactsRouter);
 app.use('/api/user', userRouter);
-app.use('/api/', filesRouter);
+app.use('/api/user/avatar', filesRouter);
 
 app.use((_, res, __) => {
   res.status(404).json({
