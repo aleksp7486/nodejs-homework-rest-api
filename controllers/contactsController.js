@@ -21,7 +21,6 @@ const getContactsController = async (req, res) => {
 
 const getContactByIdController = async (req, res) => {
   const contactId = req.params.contactId;
-  console.log(req.user);
   const { _id: owner } = req.user;
 
   const result = await service.getContactById(contactId, owner);

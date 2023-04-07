@@ -4,12 +4,27 @@ const registerUserController = async (req, res) => {
   const { email, password } = req.body;
   const user = await service.registerUser({ email, password });
 
-  return res.status(201).json({
+  res.status(201).json({
     user: {
       email: user.email,
       subscription: user.subscription,
     },
   });
+};
+
+const registrationConfirmationController = async (req, res) => {
+  const code = req.params.verificationToken;
+  await service.registrationConfirmation(code);
+  return res.status(200).json({ message: 'Verification successful' });
+};
+
+const resendConfirmationEmailController = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    res.status(400).json({ message: 'missing required field email' });
+  }
+  await service.resendConfirmationEmail(email);
+  res.status(200).json({ message: 'Verification email sent' });
 };
 
 const loginUserController = async (req, res) => {
@@ -57,4 +72,6 @@ module.exports = {
   logoutUserController,
   currentUserController,
   subscriptionUserController,
+  registrationConfirmationController,
+  resendConfirmationEmailController,
 };

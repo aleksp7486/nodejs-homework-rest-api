@@ -12,6 +12,13 @@ class ValidationError extends PhoneBookError {
   }
 }
 
+class VerificationPassed extends PhoneBookError {
+  constructor(message) {
+    super(message);
+    this.status = 400;
+  }
+}
+
 class NotAuthorizedError extends PhoneBookError {
   constructor(message) {
     super(message);
@@ -23,6 +30,13 @@ class IdError extends PhoneBookError {
   constructor(message) {
     super(message);
     this.status = 401;
+  }
+}
+
+class UserNotFound extends PhoneBookError {
+  constructor(message) {
+    super(message);
+    this.status = 404;
   }
 }
 
@@ -39,4 +53,6 @@ module.exports = {
   NotAuthorizedError,
   IdError,
   RegistrationError,
+  UserNotFound,
+  VerificationPassed,
 };

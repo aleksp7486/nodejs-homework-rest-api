@@ -55,6 +55,21 @@ const userValidation = (req, _, next) => {
   next();
 };
 
+const userConfirmationValidation = (req, _, next) => {
+  const schema = Joi.object({
+    email: Joi.string().email().required(),
+  });
+
+  const validationResult = schema.validate(req.body);
+  if (validationResult.error) {
+    next(
+      next(new ValidationError(JSON.stringify(validationResult.error.details))),
+    );
+  }
+
+  next();
+};
+
 const subscriptionValidation = (req, _, next) => {
   const schema = Joi.object({
     subscription: Joi.string().valid('starter', 'pro', 'business'),
@@ -75,4 +90,5 @@ module.exports = {
   updateContactValidation,
   userValidation,
   subscriptionValidation,
+  userConfirmationValidation,
 };
